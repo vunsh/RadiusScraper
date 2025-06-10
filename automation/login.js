@@ -16,7 +16,6 @@ async function login(driver, radiusUsername, password) {
     await passwordField.sendKeys(password);
     console.log('🔑 Entering password...' + password);
 
-    // Simple scroll and native click
     await driver.executeScript('arguments[0].scrollIntoView(true);', loginButton);
     await driver.sleep(300);
     await loginButton.click();

@@ -22,8 +22,6 @@ options.addArguments('--disable-save-password-bubble');
   try {
     await login(driver, process.env.RADIUSUSERNAME, process.env.PASSWORD);
 
-    // placeholder: next up → navigateAndFilter(driver);
-    // placeholder: exportReport(driver);
 
   } catch (err) {
     console.error('❌ Automation error:', err);

@@ -23,6 +23,7 @@ async function fillMultiSelect(driver, elementId, values) {
         await input.click();
         await input.sendKeys(value);
         await driver.sleep(200);
+        await input.sendKeys(Key.ARROW_DOWN);
         await input.sendKeys(Key.RETURN);
         await driver.sleep(400);
       }

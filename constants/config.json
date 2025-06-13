@@ -1,29 +1,24 @@
 {
-    "Attendance": {
-        "Start Date": {
-            "type": "k-datepicker",
-            "value": "FCM",
-            "description": "The start date for attendance tracking."
-        },
-        "End Date": {
-            "type": "k-datepicker",
-            "value": "default",
-            "description": "The end date for attendance tracking."
-        },
-        "Membership Type": {
-            "type": "k-multiselect",
-            "value": ["default"],
-            "description": "The type of membership for attendance tracking."
-        },
-        "Delivery": {
-            "type": "k-dropdown",
-            "value": "default",
-            "description": "The delivery method for attendance tracking."
-        },
-        "Centers": {
-            "type": "k-multiselect",
-            "value": ["default"],
-            "description": "The centers involved in attendance tracking."
-        }
+    "reports": {
+        "Attendance": "https://radius.mathnasium.com/StudentAttendanceMonthlyReport",
+        "Student": "https://radius.mathnasium.com/StudentReport",
+        "Enrollment": "https://radius.mathnasium.com/Enrollment/EnrollmentReport",
+        "DWP": "https://radius.mathnasium.com/DigitalWorkoutPlan/Report",
+        "Timesheet": "https://radius.mathnasium.com/EmployeeAttendance/InstructorTimeSheet",
+        "Assessment": "https://radius.mathnasium.com/AssessmentReport",
+        "LeadTracking": "https://radius.mathnasium.com/LeadsTrackingReport",
+        "LeadExport": "https://radius.mathnasium.com/Leads",
+        "Activities": "https://radius.mathnasium.com/MyActivities"
+    },
+    "tableDivIds": {
+        "Attendance": "gridStudentAttendance",
+        "Student": "gridStudentReport",
+        "Enrollment": "gridEnrollmentReport",
+        "DWP": "dwpReportGrid",
+        "Timesheet": "TimeSheetGrid",
+        "Assessment": "gridAssessmentReport",
+        "LeadTracking": "gridLeadsTrackingReport",
+        "LeadExport": "gridLeads",
+        "Activities": "gridActivity"
     }
 }

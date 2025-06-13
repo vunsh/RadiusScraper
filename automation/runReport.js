@@ -17,9 +17,7 @@ const copyToGoogleSheet = require('../utils/copyToGoogleSheet');
 require('dotenv').config();
 
 async function runReport({ report, region, filter, emitter, jobId, downloadDir = './downloads', downloadFilename }) {
-  // Set download directory to ./temp in project root
   const absDownloadDir = path.resolve(__dirname, '..', 'temp');
-  // Use jobId for the Excel file name if not provided
   const excelFileName = downloadFilename || (jobId ? `${jobId}.xlsx` : 'report.xlsx');
   const options = new chrome.Options();
   options
@@ -49,19 +47,16 @@ options.setUserPreferences({
 
   try {
     sendUpdate({ message: 'Logging in...' });
-    await login(driver, process.env.RADIUSUSERNAME, process.env.PASSWORD);
+    await login(driver, process.env.RADIUSUSERNAME, process.env.PASSWORD, emitter);
 
-    // Example: Use report and region to determine navigation
     if (report) {
       sendUpdate({ message: 'Navigating to report page...' });
       await navigateToPage(driver, report);
     }
 
-    // Insert region centers into filters if region is provided
     let filters = Array.isArray(filter) ? [...filter] : [];
     if (region) {
       const centerElementId = "AllCenterListMultiSelect";
-      // Updated: get centers array from regions[region].centers
       const centers = Array.isArray(regions[region]?.centers) ? regions[region].centers : [];
       if (centers.length > 0) {
         filters = filters.filter(f => !(f.type === 'multi' && f.elementId === centerElementId));
@@ -73,7 +68,6 @@ options.setUserPreferences({
       }
     }
 
-    // Apply filters
     if (Array.isArray(filters)) {
       for (const f of filters) {
         const { type, elementId, value } = f;
@@ -88,11 +82,9 @@ options.setUserPreferences({
       }
     }
 
-    // --- New: Click search and wait for table data ---
     sendUpdate({ message: 'Clicking search button...' });
     await clickSearchButton(driver);
 
-    // Find the report name from the URL for config lookup
     const reportName = Object.keys(config.reports).find(
       key => config.reports[key] === report
     );
@@ -102,7 +94,6 @@ options.setUserPreferences({
     sendUpdate({ message: 'Clicking export to Excel...' });
     await clickExportButton(driver);
 
-    // Wait for the file to appear and rename it to excelFileName
     const fs = require('fs');
     const glob = require('glob');
     const waitForDownload = (dir, timeout = 20000) => {
@@ -138,7 +129,6 @@ options.setUserPreferences({
         sendUpdate({ message: `Excel file already named ${excelFileName}` });
       }
 
-      // --- New: Copy to Google Sheet ---
       const reportName = Object.keys(config.reports).find(
         key => config.reports[key] === report
       );
@@ -147,11 +137,18 @@ options.setUserPreferences({
         try {
           await copyToGoogleSheet(region, reportName, targetPath);
           sendUpdate({ message: `Data pasted to Google Sheet for region ${region}, sheet "${reportName}"` });
+          try {
+            if (fs.existsSync(targetPath)) {
+              fs.unlinkSync(targetPath);
+              sendUpdate({ message: `Temporary Excel file deleted: ${excelFileName}` });
+            }
+          } catch (delErr) {
+            sendUpdate({ error: 'Failed to delete temporary Excel file', details: delErr.message });
+          }
         } catch (sheetErr) {
           sendUpdate({ error: 'Failed to copy data to Google Sheet', details: sheetErr.message });
         }
       }
-      // --- End new logic ---
 
     } catch (e) {
       sendUpdate({ error: 'Failed to detect or rename downloaded file', details: e.message });
@@ -161,7 +158,7 @@ options.setUserPreferences({
   } catch (err) {
     sendUpdate({ error: 'Automation failed', details: err.message });
   } finally {
-    // await driver.quit();
+    await driver.quit();
   }
 }
 

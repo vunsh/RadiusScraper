@@ -1,24 +1,24 @@
 {
     "reports": {
-        "Attendance": "https://radius.mathnasium.com/StudentAttendanceMonthlyReport",
-        "Student": "https://radius.mathnasium.com/StudentReport",
-        "Enrollment": "https://radius.mathnasium.com/Enrollment/EnrollmentReport",
-        "DWP": "https://radius.mathnasium.com/DigitalWorkoutPlan/Report",
-        "Timesheet": "https://radius.mathnasium.com/EmployeeAttendance/InstructorTimeSheet",
-        "Assessment": "https://radius.mathnasium.com/AssessmentReport",
-        "LeadTracking": "https://radius.mathnasium.com/LeadsTrackingReport",
-        "LeadExport": "https://radius.mathnasium.com/Leads",
-        "Activities": "https://radius.mathnasium.com/MyActivities"
+        "attendance": "https://radius.mathnasium.com/StudentAttendanceMonthlyReport",
+        "student": "https://radius.mathnasium.com/StudentReport",
+        "enrollment": "https://radius.mathnasium.com/Enrollment/EnrollmentReport",
+        "dwp": "https://radius.mathnasium.com/DigitalWorkoutPlan/Report",
+        "timesheet": "https://radius.mathnasium.com/EmployeeAttendance/InstructorTimeSheet",
+        "assessment": "https://radius.mathnasium.com/AssessmentReport",
+        "leadtracking": "https://radius.mathnasium.com/LeadsTrackingReport",
+        "leadexport": "https://radius.mathnasium.com/Leads",
+        "activities": "https://radius.mathnasium.com/MyActivities"
     },
     "tableDivIds": {
-        "Attendance": "gridStudentAttendance",
-        "Student": "gridStudentReport",
-        "Enrollment": "gridEnrollmentReport",
-        "DWP": "dwpReportGrid",
-        "Timesheet": "TimeSheetGrid",
-        "Assessment": "gridAssessmentReport",
-        "LeadTracking": "gridLeadsTrackingReport",
-        "LeadExport": "gridLeads",
-        "Activities": "gridActivity"
+        "attendance": "gridStudentAttendance",
+        "student": "gridStudentReport",
+        "enrollment": "gridEnrollmentReport",
+        "dwp": "dwpReportGrid",
+        "timesheet": "TimeSheetGrid",
+        "assessment": "gridAssessmentReport",
+        "leadtracking": "gridLeadsTrackingReport",
+        "leadexport": "gridLeads",
+        "activities": "gridActivity"
     }
 }

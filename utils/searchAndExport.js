@@ -6,28 +6,31 @@ async function clickSearchButton(driver) {
   await searchBtn.click();
 }
 
-async function waitForTableData(driver, reportName, timeout = 20000) {
-  const tableDivId = config.tableDivIds[reportName];
-  if (!tableDivId) throw new Error(`No tableDivId configured for report: ${reportName}`);
-  const tableDiv = await driver.wait(until.elementLocated(By.id(tableDivId)), 10000);
-  const table = await tableDiv.findElement(By.css('table'));
-  const tbody = await table.findElement(By.css('tbody'));
-
-  // Wait until the .k-no-data row disappears (data loaded)
+async function waitForTableData(driver, reportName, timeout = 90000) {
+  // Wait for the loading mask to appear
+  try {
+    await driver.wait(
+      until.elementLocated(By.css('.k-loading-mask')),
+      10000
+    );
+  } catch (e) {
+    // If it doesn't appear, maybe data loads instantly, continue
+  }
+  // Wait for the loading mask to disappear
   await driver.wait(async () => {
-    const rows = await tbody.findElements(By.css('tr'));
-    for (const row of rows) {
-      const classes = await row.getAttribute('class');
-      if (classes && classes.includes('k-no-data')) {
-        return false;
-      }
-    }
-    return rows.length > 0;
-  }, timeout, 'Table data did not load in time');
+    const masks = await driver.findElements(By.css('.k-loading-mask'));
+    return masks.length === 0 || !(await masks[0].isDisplayed());
+  }, timeout, 'Table loading mask did not disappear in time');
 }
 
 async function clickExportButton(driver) {
-  const exportBtn = await driver.wait(until.elementLocated(By.id('btnExport')), 10000);
+  // Find a button with the exact text "Export to Excel"
+  const exportBtn = await driver.wait(
+    until.elementLocated(
+      By.xpath("//button[normalize-space(text())='Export to Excel']")
+    ),
+    10000
+  );
   await exportBtn.click();
 }
 

@@ -40,15 +40,36 @@ async function copyToGoogleSheet(region, reportName, excelFilePath) {
   const sheets = await getSheetsClient();
   const data = await loadExcelData(excelFilePath);
 
-  // Get current sheet names
   const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
-  const sheet = spreadsheet.data.sheets.find(s => s.properties.title === reportName);
+  let sheet = spreadsheet.data.sheets.find(
+    s => s.properties.title.toLowerCase() === reportName.toLowerCase()
+  );
+  let actualSheetName = sheet ? sheet.properties.title : reportName;
 
-  // If sheet exists, clear it else, add it
   if (sheet) {
     await sheets.spreadsheets.values.clear({
       spreadsheetId,
-      range: `'${reportName}'`,
+      range: `'${actualSheetName}'`,
+    });
+    // Resize the sheet to 1x1 to remove any extra rows/columns
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests: [
+          {
+            updateSheetProperties: {
+              properties: {
+                sheetId: sheet.properties.sheetId,
+                gridProperties: {
+                  rowCount: 1,
+                  columnCount: 1
+                }
+              },
+              fields: 'gridProperties(rowCount,columnCount)'
+            }
+          }
+        ]
+      }
     });
   } else {
     await sheets.spreadsheets.batchUpdate({
@@ -63,12 +84,13 @@ async function copyToGoogleSheet(region, reportName, excelFilePath) {
         ]
       }
     });
+    actualSheetName = reportName;
   }
 
-  // Write data to the sheet
+  // Write data to the sheet (always use the actual sheet name)
   await sheets.spreadsheets.values.update({
     spreadsheetId,
-    range: `'${reportName}'!A1`,
+    range: `'${actualSheetName}'!A1`,
     valueInputOption: 'RAW',
     requestBody: { values: data }
   });
@@ -77,3 +99,4 @@ async function copyToGoogleSheet(region, reportName, excelFilePath) {
 }
 
 module.exports = copyToGoogleSheet;
+

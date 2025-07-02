@@ -72,28 +72,37 @@ router.get('/run/stream', requireApiKey, (req, res) => {
   const cleanup = () => {
     if (ended) return;
     ended = true;
+    clearTimeout(timeout);
+    clearInterval(keepAliveInterval);
     jobEmitters[jobId]?.removeListener('update', onUpdate);
     res.end();
   };
 
-  // Fallback: forcibly end after 2 minutes to prevent leaks
+  // Fallback: forcibly end after 8 minutes to prevent leaks
   const timeout = setTimeout(() => {
     cleanup();
-  }, 2 * 60 * 1000);
+  }, 8 * 60 * 1000);
+
+  // Send keep-alive comment every 20 seconds
+  const keepAliveInterval = setInterval(() => {
+    try {
+      res.write(': keep-alive\n\n');
+    } catch (e) {
+      cleanup();
+    }
+  }, 20000);
 
   const onUpdate = (msg) => {
     console.log(`[reportRoutes] Stream update for job ${jobId}:`, msg);
     res.write(`data: ${msg}\n\n`);
     const parsed = JSON.parse(msg);
     if (parsed.done || parsed.error) {
-      clearTimeout(timeout);
       cleanup();
     }
   };
   jobEmitters[jobId].on('update', onUpdate);
 
   req.on('close', () => {
-    clearTimeout(timeout);
     console.log(`[reportRoutes] Stream closed for job ${jobId}`);
     cleanup();
   });

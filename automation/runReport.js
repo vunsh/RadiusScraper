@@ -10,6 +10,7 @@ const {
   waitForTableData,
   clickExportButton
 } = require('../utils/automation');
+const toggleButton = require('../utils/toggleButton');
 const config = require('../constants/config.json');
 const regions = require('../constants/regions.json');
 const path = require('path');
@@ -88,6 +89,8 @@ options.setUserPreferences({
           await selectDropdown(driver, elementId, value);
         } else if (type === 'multi') {
           await fillMultiSelect(driver, elementId, value);
+        } else if (type === 'toggle') {
+          await toggleButton(driver, elementId);
         }
       }
       progress = filterProgressEnd;
@@ -113,7 +116,7 @@ options.setUserPreferences({
 
     const fs = require('fs');
     const glob = require('glob');
-    const waitForDownload = (dir, timeout = 60000) => {
+    const waitForDownload = (dir, timeout = 60000 * 5) => {
       return new Promise((resolve, reject) => {
         const start = Date.now();
         (function check() {

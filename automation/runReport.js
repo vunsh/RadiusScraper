@@ -15,6 +15,7 @@ const config = require('../constants/config.json');
 const regions = require('../constants/regions.json');
 const path = require('path');
 const copyToGoogleSheet = require('../utils/copyToGoogleSheet');
+const handleEnrollmentAllDropdown = require('../utils/handleEnrollmentAll');
 require('dotenv').config();
 
 async function runReport({ report, region, filter, emitter, jobId, downloadDir = './downloads', downloadFilename }) {
@@ -58,6 +59,28 @@ options.setUserPreferences({
       await navigateToPage(driver, report);
     }
 
+    // Detect special case for enrollment report with dropdown "All"
+    const reportKey = Object.keys(config.reports).find(key => config.reports[key] === report);
+    const hasEnrollmentAllDropdown =
+      reportKey === 'enrollment' &&
+      Array.isArray(filter) &&
+      filter.some(f => f.type === 'dropdown' && f.value === 'All');
+
+    if (hasEnrollmentAllDropdown) {
+      sendUpdate({ message: 'Special handling for enrollment report with "All" dropdown detected. Running custom handler...' }, 15);
+      await handleEnrollmentAllDropdown(
+        driver,
+        filter,
+        emitter,
+        absDownloadDir,
+        excelFileName,
+        region
+      );
+      sendUpdate({ message: 'All steps completed! Report automation finished successfully.', done: true }, 100);
+      await driver.quit();
+      return;
+    }
+
     let filters = Array.isArray(filter) ? [...filter] : [];
     if (region) {
       const centerElementId = "AllCenterListMultiSelect";
@@ -83,6 +106,7 @@ options.setUserPreferences({
         const { type, elementId, value } = f;
         progress = filterProgressStart + filterStep * (i + 1);
         sendUpdate({ message: `Applying filter of type "${type}" on element "${elementId}" with value: ${Array.isArray(value) ? value.join(', ') : value}` }, progress);
+
         if (type === 'date') {
           await selectDate(driver, elementId, value);
         } else if (type === 'dropdown') {
@@ -121,7 +145,6 @@ options.setUserPreferences({
         const start = Date.now();
         (function check() {
           glob(path.join(dir, '*.xlsx'), (err, files) => {
-            // Check for .crdownload files
             glob(path.join(dir, '*.crdownload'), (err2, downloading) => {
               if (files.length > 0 && downloading.length === 0) {
                 return resolve(files[0]);

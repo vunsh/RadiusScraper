@@ -1,7 +1,7 @@
 {
     "reports": {
         "attendance": "https://radius.mathnasium.com/StudentAttendanceMonthlyReport",
-        "student": "https://radius.mathnasium.com/StudentReport",
+        "student": "https://radius.mathnasium.com/Student",
         "enrollment": "https://radius.mathnasium.com/Enrollment/EnrollmentReport",
         "dwp": "https://radius.mathnasium.com/DigitalWorkoutPlan/Report",
         "timesheet": "https://radius.mathnasium.com/EmployeeAttendance/InstructorTimeSheet",

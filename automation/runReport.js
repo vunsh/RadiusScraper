@@ -59,28 +59,6 @@ options.setUserPreferences({
       await navigateToPage(driver, report);
     }
 
-    // Detect special case for enrollment report with dropdown "All"
-    const reportKey = Object.keys(config.reports).find(key => config.reports[key] === report);
-    const hasEnrollmentAllDropdown =
-      reportKey === 'enrollment' &&
-      Array.isArray(filter) &&
-      filter.some(f => f.type === 'dropdown' && f.value === 'All');
-
-    if (hasEnrollmentAllDropdown) {
-      sendUpdate({ message: 'Special handling for enrollment report with "All" dropdown detected. Running custom handler...' }, 15);
-      await handleEnrollmentAllDropdown(
-        driver,
-        filter,
-        emitter,
-        absDownloadDir,
-        excelFileName,
-        region
-      );
-      sendUpdate({ message: 'All steps completed! Report automation finished successfully.', done: true }, 100);
-      await driver.quit();
-      return;
-    }
-
     let filters = Array.isArray(filter) ? [...filter] : [];
     if (region) {
       const centerElementId = "AllCenterListMultiSelect";
@@ -95,6 +73,28 @@ options.setUserPreferences({
         progress = 20;
         sendUpdate({ message: `Region "${region}" detected. Filtering for centers: ${centers.join(', ')}` }, progress);
       }
+    }
+
+    // Detect special case for enrollment report with dropdown "All"
+    const reportKey = Object.keys(config.reports).find(key => config.reports[key] === report);
+    const hasEnrollmentAllDropdown =
+      reportKey === 'enrollment' &&
+      Array.isArray(filters) &&
+      filters.some(f => f.type === 'dropdown' && f.value === 'All');
+
+    if (hasEnrollmentAllDropdown) {
+      sendUpdate({ message: 'Special handling for enrollment report with "All" dropdown detected. Running custom handler...' }, 15);
+      await handleEnrollmentAllDropdown(
+        driver,
+        filters,
+        emitter,
+        absDownloadDir,
+        excelFileName,
+        region
+      );
+      sendUpdate({ message: 'All steps completed! Report automation finished successfully.', done: true }, 100);
+      await driver.quit();
+      return;
     }
 
     if (Array.isArray(filters) && filters.length > 0) {

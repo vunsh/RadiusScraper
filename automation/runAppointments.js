@@ -23,13 +23,15 @@ async function runAppointments({ emitter, jobId, ...options }) {
   }
 
   const browser = await puppeteer.launch({
-    headless: false, 
+    headless: "new", 
     args: [
-      '--no-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-gpu'
+     '--no-sandbox',
+     '--disable-setuid-sandbox',
+     '--disable-dev-shm-usage',
+     '--disable-gpu'
     ]
   });
+  console.log('Browser launched successfully.');
 
   const page = await browser.newPage();
   const client = await page.target().createCDPSession();

@@ -20,5 +20,7 @@
         "leadtracking": "gridLeadsTrackingReport",
         "leadexport": "gridLeads",
         "activities": "gridActivity"
-    }
+    },
+    "AppointySheet": "https://docs.google.com/spreadsheets/d/1B16GmDru9aOkQfL6xMeC6zPhBPBSLDU-ZLj_1I0Ln6Y/edit?gid=0#gid=0",
+    "FrontSheet": "https://docs.google.com/spreadsheets/d/1B16GmDru9aOkQfL6xMeC6zPhBPBSLDU-ZLj_1I0Ln6Y/edit?gid=610733544#gid=610733544"
 }

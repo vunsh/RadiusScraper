@@ -4,6 +4,7 @@ const cors = require('cors');
 const reportRoutes = require('./routes/reportRoutes');
 const appointmentsRoutes = require('./routes/appointmentsRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const { startAppointmentsCron } = require('./cron/scheduler');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,9 +29,11 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use('/api/reports', reportRoutes);
-// app.use('/api/appointments', appointmentsRoutes);
+app.use('/api/appointments', appointmentsRoutes);
 // app.use('/api/reviews', reviewRoutes); maybe one day :(
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+startAppointmentsCron();

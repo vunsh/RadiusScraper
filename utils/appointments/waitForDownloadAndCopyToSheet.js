@@ -120,8 +120,9 @@ async function waitForDownloadAndCopyToSheet(absDownloadDir, emitter) {
     if (frontSpreadsheetId) {
       const frontSheets = await getSheetsClient();
       const now = new Date();
+      const pstNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
       const pad = n => n.toString().padStart(2, '0');
-      const formatted = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+      const formatted = `${pstNow.getFullYear()}-${pad(pstNow.getMonth() + 1)}-${pad(pstNow.getDate())} ${pad(pstNow.getHours())}:${pad(pstNow.getMinutes())}:${pad(pstNow.getSeconds())} PST`;
       const spreadsheet = await frontSheets.spreadsheets.get({ spreadsheetId: frontSpreadsheetId });
       const frontSheet = spreadsheet.data.sheets.find(
         s => s.properties.title.trim().toLowerCase() === 'front sheet'

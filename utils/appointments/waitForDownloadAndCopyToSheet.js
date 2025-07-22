@@ -75,7 +75,7 @@ async function waitForDownloadAndCopyToSheet(absDownloadDir, emitter) {
   // Find the "Appointy" sheet in the AppointySheet spreadsheet
   const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
   const appointySheet = spreadsheet.data.sheets.find(
-    s => s.properties.title.trim().toLowerCase() === 'appointy'
+    s => s.properties.title.trim().toLowerCase() === 'daily'
   );
   const appointySheetName = appointySheet ? appointySheet.properties.title : spreadsheet.data.sheets[0].properties.title;
 

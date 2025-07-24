@@ -25,45 +25,61 @@ async function runCheckIn({ studentId, emitter, jobId }) {
     .setChromeOptions(options)
     .build();
 
+  let currentProgress = 0;
+  
   function sendUpdate(msg, progress) {
-    if (emitter) emitter.emit('update', JSON.stringify({ jobId, ...msg, progress }));
-    console.log('[runCheckIn]', { ...msg, progress });
+    if (progress !== undefined) currentProgress = progress;
+    if (emitter) emitter.emit('update', JSON.stringify({ jobId, ...msg, progress: currentProgress }));
+    console.log('[runCheckIn]', { ...msg, progress: currentProgress });
+  }
+
+  function incrementProgress(amount = 1) {
+    currentProgress = Math.min(currentProgress + amount, 100);
+    sendUpdate({}, currentProgress);
   }
 
   try {
     sendUpdate({ message: 'Welcome! Starting your check-in...' }, 0);
+    incrementProgress(2);
+    
     await login(driver, process.env.RADIUSUSERNAME, process.env.PASSWORD, emitter);
+    incrementProgress(15);
 
-    sendUpdate({ message: 'Verifying your account...' }, 20);
+    sendUpdate({ message: 'Verifying your account...' });
+    incrementProgress(3);
 
-    const validStudent = await navigateToStudentDetails(driver, studentId, emitter);
+    const validStudent = await navigateToStudentDetails(driver, studentId, sendUpdate, incrementProgress);
     if (!validStudent) {
-      sendUpdate({ error: 'Invalid Student ID. Please check and try again.' }, 100);
+      sendUpdate({ error: 'Check-in failed. Please verify your Student ID or contact support if you believe this is an error.' }, 100);
       await driver.quit();
       return;
     }
 
-    sendUpdate({ message: 'Preparing your check-in...' }, 30);
+    sendUpdate({ message: 'Preparing your check-in...' });
+    incrementProgress(5);
 
-    const attendanceReady = await openAttendanceForm(driver, emitter);
+    const attendanceReady = await openAttendanceForm(driver, sendUpdate, incrementProgress);
     if (!attendanceReady) {
       sendUpdate({ error: 'Unable to open attendance form' }, 100);
       await driver.quit();
       return;
     }
 
-    sendUpdate({ message: 'Filling out attendance form...' }, 55);
+    sendUpdate({ message: 'Filling out attendance form...' });
+    incrementProgress(5);
 
-    const attendanceSubmitted = await fillAndSubmitAttendanceForm(driver, emitter);
+    const attendanceSubmitted = await fillAndSubmitAttendanceForm(driver, sendUpdate, incrementProgress);
     if (!attendanceSubmitted) {
       sendUpdate({ error: 'Unable to submit attendance form' }, 100);
       await driver.quit();
       return;
     }
 
-    sendUpdate({ message: 'Checking you in now. Please wait...' }, 80);
+    sendUpdate({ message: 'Checking you in now. Please wait...' });
+    incrementProgress(10);
 
     await new Promise(r => setTimeout(r, 1000));
+    incrementProgress(10);
 
     sendUpdate({ message: 'You have been successfully checked in! Have a great session!', done: true }, 100);
   } catch (err) {

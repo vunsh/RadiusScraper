@@ -1,19 +1,22 @@
 const { By, Key, until } = require('selenium-webdriver');
 
-async function fillAndSubmitAttendanceForm(driver, emitter) {
-  function sendUpdate(msg) {
-    if (emitter) emitter.emit('update', JSON.stringify(msg));
-  }
-
+async function fillAndSubmitAttendanceForm(driver, sendUpdate, incrementProgress) {
   try {
     const enrollmentInput = await driver.wait(until.elementLocated(By.id('EnrollmentDropDown')), 10000);
+    incrementProgress(3);
+    
     const dropdownSpan = await enrollmentInput.findElement(By.xpath('..'));
     await dropdownSpan.click();
+    incrementProgress(2);
+    
     await driver.sleep(200);
     await dropdownSpan.sendKeys(Key.ARROW_DOWN);
+    incrementProgress(2);
+    
     await driver.sleep(100);
     await dropdownSpan.sendKeys(Key.ENTER);
     await driver.sleep(400);
+    incrementProgress(3);
 
     const kInputSpan = await dropdownSpan.findElement(By.css('.k-input'));
     const selectedText = await kInputSpan.getText();
@@ -23,16 +26,23 @@ async function fillAndSubmitAttendanceForm(driver, emitter) {
     }
 
     sendUpdate({ message: `Enrollment selected: ${selectedText}` });
+    incrementProgress(3);
 
     const departureInput = await driver.wait(until.elementLocated(By.id('DepartureTime')), 5000);
     await departureInput.clear();
     sendUpdate({ message: 'Departure time cleared.' });
+    incrementProgress(3);
 
     const saveBtn = await driver.wait(until.elementLocated(By.id('SaveAttendanceBtn')), 5000);
+    incrementProgress(2);
+    
     await driver.executeScript('arguments[0].scrollIntoView(true);', saveBtn);
     await driver.sleep(200);
+    incrementProgress(2);
+    
     await saveBtn.click();
     sendUpdate({ message: 'Attendance form submitted.' });
+    incrementProgress(5);
 
     return true;
   } catch (err) {
@@ -40,5 +50,6 @@ async function fillAndSubmitAttendanceForm(driver, emitter) {
     return false;
   }
 }
+
 
 module.exports = { fillAndSubmitAttendanceForm };

@@ -16,7 +16,6 @@ async function triggerAppointmentsJob() {
 }
 
 function startAppointmentsCron() {
-  triggerAppointmentsJob();
 
   cron.schedule('0 9-16 * * *', async () => {
     await triggerAppointmentsJob();

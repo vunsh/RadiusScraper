@@ -1,14 +1,12 @@
 const { By, until } = require('selenium-webdriver');
 
-async function login(driver, radiusUsername, password, emitter) {
+async function login(driver, radiusUsername, password, sendUpdate, incrementProgress) {
   const wait = (locator) => driver.wait(until.elementLocated(locator), 10000);
-
-  function sendUpdate(msg) {
-    if (emitter) emitter.emit('update', JSON.stringify(msg));
-  }
 
   try {
     sendUpdate({ message: 'Navigating to login page...' });
+    incrementProgress?.(2);
+
     await driver.get('https://radius.mathnasium.com/Account/Login');
 
     const usernameField = await wait(By.id('UserName'));
@@ -16,14 +14,17 @@ async function login(driver, radiusUsername, password, emitter) {
     const loginButton = await wait(By.id('login'));
 
     sendUpdate({ message: 'Entering username...' });
+    incrementProgress?.(2);
     await usernameField.sendKeys(radiusUsername);
 
     sendUpdate({ message: 'Entering password...' });
+    incrementProgress?.(2);
     await passwordField.sendKeys(password);
 
     await driver.executeScript('arguments[0].scrollIntoView(true);', loginButton);
     await driver.sleep(300);
     sendUpdate({ message: 'Clicking login button...' });
+    incrementProgress?.(2);
     await loginButton.click();
 
     try {
@@ -57,6 +58,7 @@ async function login(driver, radiusUsername, password, emitter) {
     }
 
     sendUpdate({ message: 'Login successful!' });
+    incrementProgress?.(2);
   } catch (err) {
     if (!err.message || !err.message.includes('Login failed')) {
       sendUpdate({ error: 'Login failed', details: err.message });

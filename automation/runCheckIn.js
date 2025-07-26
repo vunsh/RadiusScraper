@@ -9,7 +9,7 @@ require('dotenv').config();
 async function runCheckIn({ studentId, emitter, jobId }) {
   const options = new chrome.Options();
   options
-    // .addArguments('--headless')
+    .addArguments('--headless')
     .addArguments('--no-sandbox')
     .addArguments('--disable-dev-shm-usage')
     .addArguments('--disable-gpu');

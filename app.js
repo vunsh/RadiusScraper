@@ -12,7 +12,8 @@ const PORT = process.env.PORT || 3000;
 
 const allowedOrigins = [
   'https://lossing-automation.vercel.app',
-  'http://localhost:3000'
+  'http://localhost:3000',
+  "https://math-checkin.vercel.app"
 ];
 
 const corsOptions = {

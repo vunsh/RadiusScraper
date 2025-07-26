@@ -18,6 +18,7 @@ async function fillAndSubmitAttendanceForm(driver, sendUpdate, incrementProgress
     await driver.sleep(400);
     incrementProgress(3);
 
+    await driver.sleep(1500);
     const kInputSpan = await dropdownSpan.findElement(By.css('.k-input'));
     const selectedText = await kInputSpan.getText();
     if (selectedText.includes('Select')) {
@@ -43,6 +44,31 @@ async function fillAndSubmitAttendanceForm(driver, sendUpdate, incrementProgress
     await saveBtn.click();
     sendUpdate({ message: 'Attendance form submitted.' });
     incrementProgress(5);
+
+    try {
+      await driver.sleep(500); 
+      const modals = await driver.findElements(By.css('div#kendoWindow'));
+      for (const modal of modals) {
+        const parentId = await modal.getAttribute('id');
+        if (parentId === 'hybridDeliveryOptionModal') continue;
+
+        const h3s = await modal.findElements(By.css('h3'));
+        for (const h3 of h3s) {
+          const text = await h3.getText();
+          if (text.trim() === 'Please choose delivery type:') {
+            const confirmBtns = await modal.findElements(By.css('#confirmHybridAttBtn'));
+            if (confirmBtns.length > 0) {
+              await confirmBtns[0].click();
+              sendUpdate({ message: 'Confirmed delivery type.' });
+              incrementProgress(2);
+            }
+            break;
+          }
+        }
+      }
+    } catch (modalErr) {
+      sendUpdate({ message: 'No delivery type modal detected or error handling it.', details: modalErr.message });
+    }
 
     return true;
   } catch (err) {

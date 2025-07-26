@@ -42,7 +42,7 @@ async function runCheckIn({ studentId, emitter, jobId }) {
     sendUpdate({ message: 'Welcome! Starting your check-in...' }, 0);
     incrementProgress(2);
     
-    await login(driver, process.env.RADIUSUSERNAME, process.env.PASSWORD, emitter);
+    await login(driver, process.env.RADIUSUSERNAME, process.env.PASSWORD, sendUpdate, incrementProgress);
     incrementProgress(15);
 
     sendUpdate({ message: 'Verifying your account...' });
